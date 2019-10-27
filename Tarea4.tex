@@ -1,0 +1,125 @@
+
+%% The first command in your LaTeX source must be the \documentclass command.
+\documentclass[acmsmall]{acmart}
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%%\citestyle{acmauthoryear}
+
+\begin{document}
+
+\title{Tarea 4}
+
+
+\author{Juan Francisco Gortarez Ricardez}
+\affiliation{\institution{Tecnológico de Monterrey}}
+\email{a01021926@itesm.mx}
+
+\renewcommand{\shortauthors}{Juan}
+
+\begin{abstract}
+  Este documento tiene como propósito la demonstración de los pasos seguidos para obtener gráficos en múltiples formatos usando la librería de SNAP y Gephi. 
+\end{abstract}
+
+\keywords{Gephi, GraphML, SNAP Library, Graph Algorithms}
+
+
+\maketitle
+
+\section{Paso a Paso}
+En esta sección, se describirá a detalle el procedimiento que se siguió para exportar un grafo a múltiples formatos usando la librería de SNAP y Gephi. En este punto, se asume que uno ya descargó SNAP, Gephi, y todas sus dependencias, y que se encuentra en el directorio de instalación de SNAP.  
+
+\subsection{Descargar Dataset}
+Lo primero que se tiene que realizar es la descarga de el Dataset a analizar. Los utilizados para esta tarea se encuentran en \url{https://snap.stanford.edu/data/index.html}. Una vez descargado, el archivo se debe ubicar en el directorio de SNAP, en el mismo nivel que los otros archivos. 
+
+\subsection{Importar Dataset}
+Usando la librería de SNAP para C++, el proceso para importar el dataset es muy simple; Solamente se tiene que añadir snap.h en los includes del archivo, y utilizar las siguientes funciones:
+\begin{verbatim}
+typedef PNGraph DGraph;
+DGraph dg = TSnap::LoadEdgeList<DGraph>("<filename>",0,1);
+\end{verbatim}
+una vez realizado esto, se puede proceder a la exportación en múltiples formatos.
+
+\subsection{Exportar Grafos}
+Las implementaciones de la exportación de grafos son diferentes para cada formato, pero todas tienen como salida el archivo "wiki.<TYPE>" donde TYPE es el formato a exportar. Esta implementación exporta en los siguientes formatos:
+\begin{itemize}
+\item GraphML
+\item Gexf
+\item GDF
+\item JSON
+\end{itemize}
+
+
+\subsection{Cargar Grafos a Gephi}
+Esta implementación descargó Gephi en Ubuntu, lo cual no genera un shortcut al ejecutable. Para correr Gephi en Ubuntu, se tiene que ubicar en el directorio /bin/ del archivo descargado, y luego correr Gephi con ./gephi.
+\\
+El dataset utilizado (Wiki-vote) se ve de la siguiente manera:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\linewidth]{MLN.PNG}
+  \caption{Gráfico basado en el dataset Wiki-Vote, visto en Gephi}
+  \Description{Ejemplo de Grafo}
+\end{figure}
+
+Gephi tiene múltiples opciones para la visualización de grafos, como es el caso de mapas de calor (para medir concentración de aristas en un área), el camino más corto, y coloreado de vértices y aristas en base a su peso. A continuación se muestra la visualización de algunas de esas opciones:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\linewidth]{ML.png}
+  \caption{Gráfico utilizando la funcionalidad de mapa de calor. Puntos más naranjas indican mayor concentración}
+  \Description{Grafo con Mapa Calor}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.65\linewidth]{Pesos.PNG}
+  \caption{Gráfico utilizando la funcionalidad de coloración por peso, con algunos nodos expandidos.Se puede observar que el peso no cambia mucho entre aristas}
+  \Description{Grafo con Coloreo por Peso}
+\end{figure}
+
+\pagebreak
+\section{Ventajas/Desventajas}
+\begin{itemize}
+
+\item \textbf{Gephi:} Gephi permite una representación intuitiva y rápida de un grafo, y permite ver agrupaciones y tendencias a gran escala. Además, soporta múltiples formatos de grafos, y hace rápido al análisis de tendencias. Sin embargo, no está libre de desventajas: es muy ineficiente en recursos, y en sistemas con poca memoria de video, la representación alenta al programa a tal escala que este es inutilizable. Además, no contiene herramientas de análisis numérico exacto, lo cual obstaculiza su uso en aplicaciones de ingeniería. \cite{GephiFormat}
+\item \textbf{GraphML:} Utiliza esquemas XML, permite la coloración de nodos, y permite al usuario determinar atributos personalizados de los elementos. Sin embargo, no permite el uso de una matriz de adyacencia. \cite{GraphML}
+\item \textbf{GEXF:} Es el formato recomendado por Gephi, y contiene todas las funcionalidades de otros formatos (con excepción de soporte para una lista de adyacencia). Contiene datos para el reconocimiento de forma, tamaño y posición de nodos. \cite{GEXF}
+\item \textbf{GDF:} No utiliza esquemas XML ni una jerarquía, por lo que no puede ser visualizado de la mejor manera, sin embargo, es legible para un humano al ser ordenada en formato de texto como .csv. 
+\item \textbf{JSON:} JSON no es soportado por Gephi, por lo cual se tendrían que desargar aplicaciones adicionales o modificaciones, pero utiliza un esquema JSON como análogo del esquema XML de otros métodos para validación, y permite la visualización de posición, peso, color, entre otros. \cite{JSON} \cite{GraphML}
+\end{itemize}
+\section{Complejidad y Tiempos}
+
+Los métodos de exportación son muy similares, teniendo complejidad espacial constante, dado que no se utilizan estructuras adicionales a una lista de nodos, la cual es iterada con un apuntador para representar o exportar los datos.
+De igual manera, la complejidad temporal es igual para todos los métodos, ya que estos utilizan dos ciclos no anidados, uno dependiente de vértices y uno de aristas.Por tanto, la complejidad sería \begin{verbatim} O(V+E) \end{verbatim}
+Los tiempos de ejecución de cada algoritmo se muestran a continuación:
+\begin{itemize}
+\item GraphML: 175 ms.
+\item JSON: 125 ms.
+\item GEXF: 159 ms.
+\item GDF: 117 ms.
+\end{itemize}
+
+Se puede apreciar que existe una diferencia considerable entre el método más rápido (GDF) y el más lento (GraphML). Se realizaron múltiples iteraciones, y GDF siempre era el formato que más rápido se exportaba, seguido de JSON. 
+
+
+\section{Códigos}
+
+El código que se muestra a continuación puede ser consultado en la siguiente liga: \url{https://github.com/tec-csf/tc2017-t4-otono-2019-Starfleet-Command} , pero adicionalmente se incluye en el directorio de este archivo.
+
+
+\appendix
+
+
+ \bibliographystyle{ACM-Reference-Format}
+  \bibliography{Tarea4}
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-acmsmall.tex'.
